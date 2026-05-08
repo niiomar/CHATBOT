@@ -1,0 +1,22 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Vectorstore (rebuilt via ingest.py)
+vectorstore/
+
+# Environment variables
+.env
+
+# Streamlit config
+.streamlit/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documents (may contain sensitive content)
+docs/
+media/
