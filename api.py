@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from rag import build_chain
+import os
+
+os.environ["HF_HUB_OFFLINE"] = "1"
 
 app = FastAPI(title="NSB-AI", version="1.0.0")
 

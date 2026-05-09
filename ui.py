@@ -45,7 +45,7 @@ st.markdown("""
 }
 [data-testid="stChatInput"] textarea {
     background: transparent !important;
-    color: white !important;
+    color: black !important;
     border: none !important;
     box-shadow: none !important;
 }
@@ -58,7 +58,7 @@ st.markdown("""
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0d1117; }
 ::-webkit-scrollbar-thumb { background: #2a5298; border-radius: 3px; }
-</style>
+</style>`
 """, unsafe_allow_html=True)
 
 st.markdown(f"""
@@ -75,7 +75,7 @@ st.markdown(f"""
 
 with st.sidebar:
     
-    if st.button("Clear Chat", use_container_width=True):
+    if st.button("Clear Chat", use_container_width=True, type="primary"):
         st.session_state.chat = []
         st.rerun()
 

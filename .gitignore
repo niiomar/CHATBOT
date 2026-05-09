@@ -1,4 +1,5 @@
 # Python
+.venv/
 venv/
 __pycache__/
 *.pyc
@@ -20,3 +21,4 @@ Thumbs.db
 # Documents (may contain sensitive content)
 docs/
 media/
+local_models/

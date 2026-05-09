@@ -4,6 +4,7 @@ from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_chroma import Chroma
 import os
 import shutil
+import torch
 
 DOCS_PATH = "./docs"
 VECTORSTORE_PATH = "./vectorstore"
@@ -47,22 +48,26 @@ def ingest():
     docs = load_documents()
     if not docs:
         return
-
-    print(f"Loaded {len(docs)} page(s). Splitting...")
+    
     chunks = RecursiveCharacterTextSplitter(
         chunk_size=1200, chunk_overlap=200
     ).split_documents(docs)
     print(f"{len(chunks)} chunks ready.")
-
-    embed = HuggingFaceEmbeddings(
-        model_name="all-MiniLM-L6-v2",
-        model_kwargs={"device": "cpu"},
+    
+    
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    embeddings = HuggingFaceEmbeddings(
+        cache_folder="models",
+        model_name="./local_models/nomic-embed-text-v1.5",
+        model_kwargs={"device": device},
         encode_kwargs={"normalize_embeddings": True}
     )
 
-    Chroma.from_documents(chunks, embed, persist_directory=VECTORSTORE_PATH)
+    Chroma.from_documents(chunks, embeddings, persist_directory=VECTORSTORE_PATH)
     print(f"Done. Vectorstore saved to {VECTORSTORE_PATH}")
 
 
 if __name__ == "__main__":
+    os.environ["TRANSFORMERS_OFFLINE"] = "1"
+    os.environ["HF_HUB_OFFLINE"] = "1"
     ingest()
