@@ -1,0 +1,31 @@
+{
+  "files.associations": {
+    "*.jinja": "jinja",
+    "*.toml": "toml"
+  },
+  "emmet.includeLanguages": {
+    "jinja-html": "html",
+    "json": "json"
+  },
+  "[jinja-html]": {
+    "editor.defaultFormatter":"monosans.djlint",
+    "editor.formatOnSave": true,
+  },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true
+  },
+  "[toml]":{
+    "editor.defaultFormatter":"tamasfe.even-better-toml",
+    "editor.formatOnSave": true
+  },
+  "[css][javascript][html][typescript][json]":{
+    "editor.defaultFormatter":"esbenp.prettier-vscode",
+    "editor.formatOnSave": true
+  },
+  "[svelte]":{
+    "editor.defaultFormatter":"svelte.svelte-vscode",
+    "editor.formatOnSave": true
+  }
+}
+

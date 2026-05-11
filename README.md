@@ -27,15 +27,26 @@ nsb-ai/
 1. Install dependencies
 
 ```powershell
+#To install ollama if you have not already
 irm https://ollama.com/install.ps1 | iex
-ollama pull llama3.1
-irm https://astral.sh/uv/install.ps1 | iex
-uv sync
-git clone https://huggingface.co/nomic-ai/nomic-embed-text-v1.5 ./local_models/nomic-embed-text-v1.5
 
+#To download llama3.1 LLM if you have not already
+ollama pull llama3.1
+
+#To install uv if you have not already
+irm https://astral.sh/uv/install.ps1 | iex
+
+#To install ruff for python linting
+uv tool install ruff
+
+#To create a the venv and install the packages in the project.toml file
+uv sync
+
+#To download the nomic-embed-text-v1.5 embedding model
+git clone https://huggingface.co/nomic-ai/nomic-embed-text-v1.5 ./local_models/nomic-embed-text-v1.5
 ```
 
-2. Add documents to `./docs` and run ingestion
+2. Add documents to `./docs` and run ingest.py
 
 ```powershell
 uv run ingest.py
@@ -55,6 +66,6 @@ uv run streamlit run ui.py
 
 ## Requirements
 
-- Python 3.14.3+
+- Python 3.14+
 - [Ollama](https://ollama.com) with `llama3.1` pulled
 - 8GB RAM minimum
