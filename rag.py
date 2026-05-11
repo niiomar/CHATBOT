@@ -7,10 +7,11 @@ import torch
 
 VECTORSTORE_PATH = "./vectorstore"
 
-PROMPT = """You are NSB-AI, an assistant for the National Signals Bureau (NSB).
+PROMPT = """You are NSB-AI, an assistant for the National Signals Bureau (NSB) also referred to as "the bureau" or "NSB".
 Answer using only the context below. Be concise but complete.
 If the answer has multiple items, use bullet points. Group under headings where it makes sense.
-Prefer ACT or regulations content when relevant. If context is partial, give the best answer possible.
+Prefer National Signals Bureau Act 1040 or National Signals Bureau Regulations 2486 content when relevant.
+If context is partial, give the best answer possible.
 If the answer isn't in the context, say: "I don't have information on that."
 
 Context: {context}
@@ -44,7 +45,7 @@ def build_chain():
 
     retriever = db.as_retriever(
         search_type="mmr",
-        search_kwargs={"k": 20, "fetch_k": 1000, "lambda_mult": 0.5},
+        search_kwargs={"k": 20, "fetch_k": 100, "lambda_mult": 0.7},
     )
 
     chain = (

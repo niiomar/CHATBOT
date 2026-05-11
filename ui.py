@@ -3,9 +3,13 @@ import requests
 import base64
 
 API_URL = "http://127.0.0.1:8000/ask"
-BLANK_AVATAR = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+BLANK_AVATAR = (
+    "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+)
 
-st.set_page_config(page_title="NSB-AI Assistant", page_icon="./media/nsb-logo.png", layout="centered")
+st.set_page_config(
+    page_title="NSB-AI Assistant", page_icon="./media/nsb-logo.png", layout="centered"
+)
 
 
 def get_base64_image(path):
@@ -15,7 +19,8 @@ def get_base64_image(path):
 
 logo = get_base64_image("./media/nsb-logo.png")
 
-st.markdown("""
+st.markdown(
+    """
 <style>
 [data-testid="stAppViewContainer"] { background-color: #0d1117; }
 [data-testid="stSidebar"] { background-color: #161b22; border-right: 1px solid #1f2937; }
@@ -58,10 +63,13 @@ st.markdown("""
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-track { background: #0d1117; }
 ::-webkit-scrollbar-thumb { background: #2a5298; border-radius: 3px; }
-</style>`
-""", unsafe_allow_html=True)
+</style>
+""",
+    unsafe_allow_html=True,
+)
 
-st.markdown(f"""
+st.markdown(
+    f"""
 <div class="nsb-header">
     <div style="display:flex; align-items:center; gap:16px;">
         <img src="data:image/png;base64,{logo}" width="56"/>
@@ -71,10 +79,11 @@ st.markdown(f"""
         </div>
     </div>
 </div>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 with st.sidebar:
-    
     if st.button("Clear Chat", use_container_width=True, type="primary"):
         st.session_state.chat = []
         st.rerun()
@@ -92,10 +101,7 @@ with st.sidebar:
     st.divider()
 
     try:
-        r = requests.get(
-            "http://127.0.0.1:8000/health",
-            timeout=2
-        )
+        r = requests.get("http://127.0.0.1:8000/health", timeout=2)
 
         if r.status_code == 200:
             st.success("API Online 🟢")
@@ -130,7 +136,9 @@ if user_input:
         first_chunk = True
 
         try:
-            with requests.post(API_URL, json={"question": user_input}, stream=True, timeout=600) as r:
+            with requests.post(
+                API_URL, json={"question": user_input}, stream=True, timeout=600
+            ) as r:
                 for chunk in r.iter_content(chunk_size=None):
                     if chunk:
                         if first_chunk:
