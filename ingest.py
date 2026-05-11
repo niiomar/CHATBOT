@@ -48,19 +48,18 @@ def ingest():
     docs = load_documents()
     if not docs:
         return
-    
+
     chunks = RecursiveCharacterTextSplitter(
         chunk_size=1200, chunk_overlap=200
     ).split_documents(docs)
     print(f"{len(chunks)} chunks ready.")
-    
-    
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     embeddings = HuggingFaceEmbeddings(
         cache_folder="models",
         model_name="./local_models/nomic-embed-text-v1.5",
         model_kwargs={"device": device},
-        encode_kwargs={"normalize_embeddings": True}
+        encode_kwargs={"normalize_embeddings": True},
     )
 
     Chroma.from_documents(chunks, embeddings, persist_directory=VECTORSTORE_PATH)

@@ -26,30 +26,26 @@ def format_docs(docs):
 
 def build_chain():
     device = "cuda" if torch.cuda.is_available() else "cpu"
-    
+
     embedding_function = HuggingFaceEmbeddings(
         cache_folder="models",
         model_name="./local_models/nomic-embed-text-v1.5",
         model_kwargs={"device": device},
-        encode_kwargs={"normalize_embeddings": True}
+        encode_kwargs={"normalize_embeddings": True},
     )
-    
-    db = Chroma(persist_directory=VECTORSTORE_PATH, embedding_function=embedding_function)
 
-    
+    db = Chroma(
+        persist_directory=VECTORSTORE_PATH, embedding_function=embedding_function
+    )
+
     llm = ChatOllama(
-        model="llama3.1",
-        temperature=0,
-        num_predict=500,
-        num_ctx=100000,
-        streaming=True
+        model="llama3.1", temperature=0, num_predict=500, num_ctx=100000, streaming=True
     )
 
     retriever = db.as_retriever(
         search_type="mmr",
         search_kwargs={"k": 20, "fetch_k": 1000, "lambda_mult": 0.5},
     )
-
 
     chain = (
         {"context": retriever | format_docs, "question": RunnablePassthrough()}
