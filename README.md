@@ -43,7 +43,7 @@ uv tool install ruff
 uv sync
 
 #To download the nomic-embed-text-v1.5 embedding model
-git clone https://huggingface.co/nomic-ai/nomic-embed-text-v1.5 ./local_models/nomic-embed-text-v1.5
+git clone --depth 1 https://huggingface.co/nomic-ai/nomic-embed-text-v1.5 ./local_models/nomic-embed-text-v1.5
 ```
 
 2. Add documents to `./docs` and run ingest.py
