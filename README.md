@@ -51,8 +51,17 @@ git clone --depth 1 https://huggingface.co/nomic-ai/nomic-embed-text-v1.5 ./loca
 ```powershell
 uv run ingest.py
 ```
+3. > **Note:** Before starting the API, make sure Ollama is running in the background.
+> On Windows, Ollama usually starts automatically on boot. To verify, run:
+> ```powershell
+> ollama list
+> ```
+> If it returns a list of models, Ollama is running. If you get an error, start it manually:
+> ```powershell
+> ollama serve
+> ```
 
-3. Start the API
+4. Start the API
 
 ```powershell
 uv run uvicorn api:app --port 8000
