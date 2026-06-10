@@ -67,7 +67,7 @@ uv run ingest.py
 uv run uvicorn api:app --port 8000
 ```
 
-4. Start the UI
+5. Start the UI
 
 ```powershell
 uv run streamlit run ui.py
