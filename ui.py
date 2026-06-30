@@ -8,7 +8,7 @@ BLANK_AVATAR = (
 )
 
 st.set_page_config(
-    page_title="NSB-AI Assistant", page_icon="./media/nsb-logo.png", layout="centered"
+    page_title="Chatbot Assistant", page_icon="./media/nsb-logo.png", layout="centered"
 )
 
 
@@ -91,7 +91,7 @@ with st.sidebar:
     st.divider()
 
     st.markdown("""
-**NSB-AI** answers strictly from official NSB documents.
+**Chatbot Assistant** answers strictly from official private documents.
 
 - No external knowledge
 - No guessing
@@ -116,7 +116,7 @@ if "chat" not in st.session_state:
 
 if not st.session_state.chat:
     with st.chat_message("assistant", avatar=BLANK_AVATAR):
-        st.markdown("Hello, I'm **NSB-AI**. Ask me anything.")
+        st.markdown("Hello, I'm **a chatbot assistant**. Ask me anything.")
 
 for msg in st.session_state.chat:
     with st.chat_message(msg["role"], avatar=BLANK_AVATAR):
