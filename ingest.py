@@ -9,7 +9,6 @@ import torch
 DOCS_PATH = "./docs"
 VECTORSTORE_PATH = "./vectorstore"
 
-
 def load_documents():
     docs = []
     files = [f for f in os.listdir(DOCS_PATH) if f.endswith((".pdf", ".docx", ".txt"))]
@@ -38,8 +37,7 @@ def load_documents():
             print(f"Skipped {filename}: {e}")
 
     return docs
-
-
+    
 def ingest():
     if os.path.exists(VECTORSTORE_PATH):
         shutil.rmtree(VECTORSTORE_PATH)
