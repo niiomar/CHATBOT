@@ -20,10 +20,8 @@ Question: {question}
 
 Answer:"""
 
-
 def format_docs(docs):
     return "\n\n".join(d.page_content for d in docs)
-
 
 def build_chain():
     device = "cuda" if torch.cuda.is_available() else "cpu"
