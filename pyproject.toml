@@ -1,7 +1,7 @@
 [project]
-name = "nsb-ai-main"
+name = "rag-system"
 version = "0.1.0"
-description = "Add your description here"
+description = "A local RAG chatbot: FastAPI + Streamlit, Ollama LLM, Chroma vector store."
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
@@ -17,21 +17,41 @@ dependencies = [
     "langchain-text-splitters==1.1.2",
     "nltk>=3.9.4",
     "pypdf>=6.10.2",
+    "rank-bm25>=0.2.2",
     "requests>=2.33.1",
-    "sentence-transformers>=5.4.1",
+    "slowapi>=0.1.9",
     "streamlit==1.57.0",
+]
+
+[project.optional-dependencies]
+# Only needed to actually run ingest.py/api.py (embeddings + reranking).
+# Kept separate so CI/tests can install fast without pulling the torch wheel.
+# CPU-only build by default (see [tool.uv.sources] below) - it's what nomic-embed-text
+# and the cross-encoder reranker actually run on; the LLM itself runs in Ollama, which
+# handles its own GPU acceleration independently of this dependency. torchvision/
+# torchaudio are dropped: nothing here does vision/audio, so they're dead weight.
+# If you have an NVIDIA GPU and want CUDA-accelerated embeddings/reranking, point
+# [tool.uv.sources] at https://download.pytorch.org/whl/cuXXX instead.
+ml = [
+    "einops>=0.8",
+    "sentence-transformers>=5.4.1",
     "torch>=2.11.0",
-    "torchaudio>=2.11.0",
-    "torchvision>=0.26.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3",
+    "httpx>=0.27",
 ]
 
 [[tool.uv.index]]
-name = "pytorch-cu130"
-url = "https://download.pytorch.org/whl/cu130"
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
-
 [tool.uv.sources]
-torch = { index = "pytorch-cu130" }
-torchvision = { index = "pytorch-cu130" }
-torchaudio = { index = "pytorch-cu130" }
+torch = { index = "pytorch-cpu" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

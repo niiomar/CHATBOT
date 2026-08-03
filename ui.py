@@ -1,8 +1,11 @@
 import streamlit as st
 import requests
 import base64
+import os
 
-API_URL = "http://127.0.0.1:8000/ask"
+API_BASE_URL = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000")
+API_URL = f"{API_BASE_URL}/ask"
+API_KEY = os.environ.get("API_KEY")
 BLANK_AVATAR = (
     "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
 )
@@ -99,7 +102,7 @@ with st.sidebar:
     st.divider()
 
     try:
-        r = requests.get("http://127.0.0.1:8000/health", timeout=2)
+        r = requests.get(f"{API_BASE_URL}/health", timeout=2)
 
         if r.status_code == 200:
             st.success("API Online 🟢")
@@ -120,7 +123,7 @@ for msg in st.session_state.chat:
     with st.chat_message(msg["role"], avatar=BLANK_AVATAR):
         st.markdown(msg["content"])
 
-user_input = st.chat_input("Ask a question...")
+user_input = st.chat_input("Ask a question...", max_chars=2000)
 
 if user_input:
     st.session_state.chat.append({"role": "user", "content": user_input})
@@ -133,10 +136,19 @@ if user_input:
         answer = ""
         first_chunk = True
 
+        history = st.session_state.chat[:-1][-20:]
+
+        headers = {"X-API-Key": API_KEY} if API_KEY else {}
+
         try:
             with requests.post(
-                API_URL, json={"question": user_input}, stream=True, timeout=600
+                API_URL,
+                json={"question": user_input, "chat_history": history},
+                headers=headers,
+                stream=True,
+                timeout=600,
             ) as r:
+                r.raise_for_status()
                 for chunk in r.iter_content(chunk_size=None):
                     if chunk:
                         if first_chunk:
