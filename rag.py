@@ -1,14 +1,15 @@
-from langchain_chroma import Chroma
-from langchain_huggingface import HuggingFaceEmbeddings
-from langchain_ollama import ChatOllama
-from langchain_core.documents import Document
-from langchain_core.prompts import PromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_community.retrievers import BM25Retriever
-from langchain_classic.retrievers.ensemble import EnsembleRetriever
 import asyncio
 import logging
 import os
+
+from langchain_chroma import Chroma
+from langchain_classic.retrievers.ensemble import EnsembleRetriever
+from langchain_community.retrievers import BM25Retriever
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import PromptTemplate
+from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_ollama import ChatOllama
 
 logger = logging.getLogger("chatbot_api.rag")
 
@@ -85,7 +86,7 @@ def build_retriever(db):
     stored = db.get()
     corpus = [
         Document(page_content=content, metadata=metadata or {})
-        for content, metadata in zip(stored.get("documents") or [], stored.get("metadatas") or [])
+        for content, metadata in zip(stored.get("documents") or [], stored.get("metadatas") or [], strict=True)
     ]
 
     if not corpus:
@@ -147,7 +148,7 @@ class RagChain:
             return [], None
         pairs = [[question, d.page_content] for d in docs]
         scores = self.reranker.predict(pairs)
-        ranked = sorted(zip(scores, docs), key=lambda pair: pair[0], reverse=True)
+        ranked = sorted(zip(scores, docs, strict=True), key=lambda pair: pair[0], reverse=True)
         top = ranked[:RERANK_TOP_N]
         best_score = float(top[0][0])
         return [d for _, d in top], best_score

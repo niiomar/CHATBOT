@@ -113,12 +113,11 @@ ollama pull llama3.1
 # uv, if you don't have it
 irm https://astral.sh/uv/install.ps1 | iex
 
-# ruff, for linting
-uv tool install ruff
-
 # Project dependencies, including torch (CPU-only by default — see Architecture above)
 uv sync --extra ml
 ```
+
+`ruff` is a pinned dev dependency (installed above via `uv sync`), run as `uv run ruff check .` so results can't drift between machines. `uv tool install ruff` separately is only useful if you want a bare `ruff` on PATH for editor/IDE integration — the version CI actually enforces is the one in `uv.lock`.
 
 `uv sync` with no `--extra` also works and is enough for linting/tests — see [Testing & CI](#testing--ci).
 
@@ -223,10 +222,11 @@ Interactive OpenAPI docs are available at `http://127.0.0.1:8000/docs` while the
 
 ```powershell
 uv sync
+uv run ruff check .
 uv run pytest
 ```
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `ruff check` and this test suite on every push/PR to `main`.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `uv run ruff check .` and this test suite on every push/PR to `main`. Both `ruff` and its rule selection are pinned (`uv.lock` and `[tool.ruff.lint]` in `pyproject.toml`), so lint results are the same locally and in CI regardless of when either runs.
 
 ## Troubleshooting
 
@@ -254,6 +254,12 @@ The BM25 half of hybrid retrieval is an in-memory snapshot built when the API st
 The upstream `nomic-embed-text-v1.5` repo bundles multiple onnx export variants alongside the safetensors weights actually used here. Use the `GIT_LFS_SKIP_SMUDGE=1` clone + selective `git lfs pull` shown in [Quickstart](#quickstart) rather than a plain `git clone`.
 </details>
 
+<details>
+<summary><strong>`ruff check .` passes locally but fails in CI (or vice versa)</strong></summary>
+
+This happened once during development: CI's `uvx ruff check .` fetched a newer, unpinned ruff release with a different default rule set than the version cached locally, so CI failed on rules the local run never saw. `ruff` is now a pinned dev dependency (`uv.lock`) with an explicit rule selection in `[tool.ruff.lint]` (`pyproject.toml`), and both CI and the commands in this README run `uv run ruff check .` — never bare `uvx ruff`, which always resolves "latest" and isn't reproducible.
+</details>
+
 ## Known Limitations
 
 - **Single shared API key** — `API_KEY` is one secret for all clients. Logs record *what* was asked but not *who* asked it; there's no per-user identity or audit trail.
@@ -263,7 +269,7 @@ The upstream `nomic-embed-text-v1.5` repo bundles multiple onnx export variants 
 
 ## Contributing
 
-Before opening a PR: `uvx ruff check .` and `uv run pytest` should both pass (this is exactly what CI checks). Keep changes scoped — this is a small, single-purpose project, and PRs are easiest to review when they touch one concern at a time.
+Before opening a PR: `uv run ruff check .` and `uv run pytest` should both pass (this is exactly what CI checks). Keep changes scoped — this is a small, single-purpose project, and PRs are easiest to review when they touch one concern at a time.
 
 ## License
 

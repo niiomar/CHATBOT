@@ -1,19 +1,21 @@
+import asyncio
+import logging
+import os
+from functools import lru_cache
+from typing import Literal
+
+import requests
 from fastapi import Depends, FastAPI, HTTPException, Request, Security
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.security import APIKeyHeader
-from functools import lru_cache
 from pydantic import BaseModel, Field
-from rag import OLLAMA_BASE_URL, build_chain
 from slowapi import Limiter
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
-from typing import Literal
-import asyncio
-import logging
-import os
-import requests
+
+from rag import OLLAMA_BASE_URL, build_chain
 
 os.environ["HF_HUB_OFFLINE"] = "1"
 
@@ -110,6 +112,6 @@ async def readiness(chain=Depends(get_chain)):
     try:
         await asyncio.to_thread(check_ollama)
     except requests.exceptions.RequestException as e:
-        raise HTTPException(status_code=503, detail=f"Ollama unreachable: {e}")
+        raise HTTPException(status_code=503, detail=f"Ollama unreachable: {e}") from e
 
     return {"status": "ready"}

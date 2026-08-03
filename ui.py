@@ -1,7 +1,8 @@
-import streamlit as st
-import requests
 import base64
 import os
+
+import requests
+import streamlit as st
 
 API_BASE_URL = os.environ.get("API_BASE_URL", "http://127.0.0.1:8000")
 API_URL = f"{API_BASE_URL}/ask"
@@ -109,7 +110,7 @@ with st.sidebar:
         else:
             st.error("API Offline 🔴")
 
-    except Exception:
+    except requests.exceptions.RequestException:
         st.error("API Offline 🔴")
 
 if "chat" not in st.session_state:
@@ -159,8 +160,8 @@ if user_input:
         except requests.exceptions.Timeout:
             answer = "Request timed out. Try again."
             placeholder.markdown(answer)
-        except Exception as e:
-            answer = f"Connection error: {str(e)}"
+        except requests.exceptions.RequestException as e:
+            answer = f"Connection error: {e!s}"
             placeholder.markdown(answer)
 
     st.session_state.chat.append({"role": "assistant", "content": answer})

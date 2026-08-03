@@ -16,13 +16,15 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Lint
-        run: uvx ruff check .
-
       # Deliberately not "--extra ml": that pulls multi-GB CUDA torch wheels and
-      # isn't needed to run the test suite (see pyproject.toml).
+      # isn't needed to run the test suite (see pyproject.toml). ruff is pinned via
+      # uv.lock (dev dependency) rather than `uvx ruff` so lint results can't drift
+      # between an unpinned "latest" and what's actually configured in pyproject.toml.
       - name: Install dependencies
         run: uv sync
+
+      - name: Lint
+        run: uv run ruff check .
 
       - name: Test
         run: uv run pytest
