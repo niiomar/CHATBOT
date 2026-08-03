@@ -1,0 +1,84 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    # Uncomment to give the container GPU access (requires the NVIDIA Container Toolkit):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  api:
+    build: .
+    command: uvicorn api:app --host 0.0.0.0 --port 8000
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+      API_KEY: ${API_KEY:-}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:8501}
+      ASK_RATE_LIMIT: ${ASK_RATE_LIMIT:-20/minute}
+    volumes:
+      - ./docs:/app/docs
+      - ./vectorstore:/app/vectorstore
+      - ./local_models:/app/local_models
+      - ./models:/app/models
+    ports:
+      - "8000:8000"
+    depends_on:
+      ollama:
+        condition: service_healthy
+    healthcheck:
+      # /health/ready builds the chain (embeddings + reranker + vectorstore) and pings
+      # Ollama - first-time model loading can take a while, hence the generous grace period.
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=5)"]
+      interval: 15s
+      timeout: 10s
+      retries: 12
+      start_period: 60s
+
+  ui:
+    build: .
+    command: streamlit run ui.py --server.address 0.0.0.0 --server.port 8501
+    environment:
+      API_BASE_URL: http://api:8000
+      API_KEY: ${API_KEY:-}
+    volumes:
+      - ./media:/app/media
+    ports:
+      - "8501:8501"
+    depends_on:
+      api:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s
+
+  ingest:
+    build: .
+    command: python ingest.py
+    profiles: ["tools"]
+    environment:
+      API_BASE_URL: http://api:8000
+      API_KEY: ${API_KEY:-}
+    volumes:
+      - ./docs:/app/docs
+      - ./vectorstore:/app/vectorstore
+      - ./local_models:/app/local_models
+      - ./models:/app/models
+
+volumes:
+  ollama_data:

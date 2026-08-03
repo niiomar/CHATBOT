@@ -1,0 +1,12 @@
+.git
+.venv
+venv
+__pycache__
+*.pyc
+vectorstore/
+docs/
+media/
+local_models/
+models/
+.env
+.streamlit/
